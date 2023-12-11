@@ -1,24 +1,15 @@
 #project pigeon
 
-print("hello")
-answer = input("what is your name?: ")
-pepa = True
-if answer == "Pepa" or "Matyáš":
-    print("hello pepa or matyas")
-else:
-    print("wrong name")
-    
+#learning phase
 
-class human:
-    def __init__(self, age, name) -> None:
-        self.age = age
-        self.name = name
-        print(age)
-        print(name)
-    def eating(food):
-        print("this human is eating ", food)
-    
-human(99, "Mikuláš")    
+# step 1: variables
+
+variable = "value" #you dont tell a type of a variable here
+
+# step 2: functions
+
+def function_name():        #def operator sp
+    print("hello world")
 
     
 
