@@ -1,14 +1,14 @@
 if __name__ == "__main__":
-
     from picamera import PiCamera
-
     from time import sleep
-
     import cv2 as cv
-
     import numpy as np
+    from scipy import stats
     import math
     
+#test:
+    time_difference = 7
+
 
     cam = PiCamera()
 
@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     #-- Step 1: Detect the keypoints using SURF Detector, compute the descriptors
 
-    minHessian = 400
+   
 
     detector = cv.SIFT_create()
 
@@ -144,24 +144,38 @@ if __name__ == "__main__":
             coordinates_1.append((x1,y1))
             coordinates_2.append((x2,y2))
         return coordinates_1, coordinates_2
+    
+    
     def calculate_mean_distance(coordinates_1, coordinates_2):
-        all_distances = 0
+        all_distances = []
         merged_coordinates = list(zip(coordinates_1, coordinates_2))
         for coordinate in merged_coordinates:
             x_difference = coordinate[0][0] - coordinate[1][0]
             y_difference = coordinate[0][1] - coordinate[1][1]
             distance = math.hypot(x_difference, y_difference)
-            all_distances = all_distances + distance
-        return all_distances / len(merged_coordinates)
+            all_distances.append(distance)
+            median_value = np.median(all_distances)
+            if isinstance(median_value, np.ndarray) and len(median_value) == 2:
+                median_value = np.median(median_value)
+            
+            first_mode = stats.mode(all_distances)
+            modes = first_mode.mode
+            mode_value = np.median(modes)
+            
+            
+            
+        return (median_value + mode_value)/2
+        
     coordinates_1, coordinates_2 = find_matching_coordinates(keypoints_obj, keypoints_scene, good_matches)
     average_feature_distance = calculate_mean_distance(coordinates_1, coordinates_2)
+    
+    
     def calculate_speed_in_kmps(feature_distance, GSD, time_difference):
         distance = feature_distance * GSD / 100000
         speed = distance / time_difference
         return speed
-    #set time_difference just for a test
-    time_difference = 5
+    
     speed = calculate_speed_in_kmps(average_feature_distance, 12648, time_difference)
-    print(speed)
+    print("The speed of an ISS is ", speed, "(km/s)")
     #cv.imshow('Good Matches & Object detection', resized_picture)
     cv.waitKey(0)
