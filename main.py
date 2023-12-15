@@ -15,7 +15,7 @@ class PigeonISS():
     def __init__(self):
         self.iss = ISS()
         self.img_counter = 0
-        self.d = collections.deque(maxlen=10)
+        self.d = collections.deque(maxlen=5)
         
     def capture(self, camera):
         image = np.empty(cam.resolution[::-1] + (3,), dtype=np.uint8)
