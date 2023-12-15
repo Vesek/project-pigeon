@@ -1,0 +1,48 @@
+# Import the libraries
+from sense_hat import SenseHat
+from time import sleep
+
+# Set up the Sense HAT
+sense = SenseHat()
+sense.set_rotation(270, False)
+
+# Set up the colour sensor
+sense.color.gain = 60 # Set the sensitivity of the sensor
+sense.color.integration_cycles = 64 # The interval at which the reading will be taken
+
+# Add colour variables and image
+off = (0, 0, 0)
+on = (1, 1, 1)
+rgb = sense.color 
+c = (rgb.red, rgb.green, rgb.blue) 
+
+# Display the image
+sine = [off, off, off, off, off, off, off, off,
+        off, off, off, off, off, off, off, off,
+        off, off, off, off, off, off, off, off,
+        off, off, off, off, off, off, off, off,
+        off, off, off, off, off, off, off, off,
+        off, off, off, off, off, off, off, off,
+        off, off, off, off, off, off, off, off,
+        off, off, off, off, off, off, off, off]
+image = [
+  c, c, c, c, c, c, c, c,
+  c, c, c, c, c, c, c, c,
+  c, c, c, c, c, c, c, c,
+  c, c, c, c, c, c, c, c,
+  c, c, c, c, c, c, c, c,
+  c, c, c, c, c, c, c, c,
+  c, c, c, c, c, c, c, c,
+  c, c, c, c, c, c, c, c]
+
+output = []
+for first, second in zip(sine, image):
+    pix_output = []
+    for n, m in zip(first, second):
+        pix_output.append(n*m)
+    output.append(tuple(pix_output))
+
+print(output)
+
+sense.set_pixels(output)
+print(image)
