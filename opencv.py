@@ -1,17 +1,12 @@
 from __future__ import print_function
 import cv2 as cv
 import numpy as np
-import argparse
 '''cimage = cv2.imread("C:\\Users\\Fiser\\python\\earth\\earthview_one.jpg")
 bwimage = cv2.cvtColor(cimage, cv2.COLOR_RGB2GRAY)
 cv2.imshow("image_one", bwimage)'''
 
-parser = argparse.ArgumentParser(description='Code for Feature Matching with FLANN tutorial.')
-parser.add_argument('image_dotRight', help="C:\\Users\\Fiser\\OneDrive\\Obrázky\\Snímky obrazovky\\Snímek obrazovky (100).png", default='Snímek obrazovky (100).png')
-parser.add_argument('image_dotLeft', help="C:\\Users\\Fiser\\OneDrive\\Obrázky\\Snímky obrazovky\\Snímek obrazovky (101).png", default='Snímek obrazovky (101).png')
-args = parser.parse_args()
-img_object = cv.imread(cv.samples.findFile(args.image_dotRight), cv.IMREAD_GRAYSCALE)
-img_scene = cv.imread(cv.samples.findFile(args.image_dotLeft), cv.IMREAD_GRAYSCALE)
+img_object = cv.imread("C:\\Users\\Fiser\\OneDrive\\Obrázky\\Snímky obrazovky\\Snímek obrazovky (100).png", cv.IMREAD_GRAYSCALE)
+img_scene = cv.imread("C:\\Users\\Fiser\\OneDrive\\Obrázky\\Snímky obrazovky\\Snímek obrazovky (101).png", cv.IMREAD_GRAYSCALE)
 if img_object is None or img_scene is None:
     print('Could not open or find the images!')
     exit(0)
