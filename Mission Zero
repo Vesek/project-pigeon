@@ -15,18 +15,32 @@ coefrequency = 1
 def t():
     return((time.time() - times)*speed)
 
-for o in range(100):
-    ck = (255, 255, 255)
+while t() < 29:
     rgb = sense.color 
     c = (rgb.red, rgb.green, rgb.blue)
-    k = (1, 1, 1)
-    frequency = ((((c[0])*256+c[1])*256+c[2])/(2**24))*0.6+0.1
-    #0.7-0.1
     amplitude = sum(c)/765*coeamplitude
     def pixel(row, column):
-        if abs(math.cos((t() + column)*frequency)* 4 * amplitude + 3.5 - row) <= 0.5:
-            return (ck)
+        Ra = c[0]
+        Ga = c[1]
+        Ba = c[2]
+        Rf = 430
+        Gf = 565
+        Bf = 650
+        f = 0.001 * coefrequency
+        a = 0.007 * coeamplitude
+        if abs((a * (Ra * math.sin((t() + column) * f * Rf) + Ga * math.sin((t() + column) * f * Gf) + Ba * math.sin((t() + column) * f * Bf))) + 3.5 - row) <= 0.5:
+            return (c)
         return (0, 0, 0)
+
+    Ra = c[0]
+    Ga = c[1]
+    Ba = c[2]
+    Rf = 430
+    Gf = 565
+    Bf = 650
+    f = 0.001
+    a = 0.007
+    print((a * (Ra * math.sin((t()) * f * Rf) + Ga * math.sin((t()) * f * Gf) + Ba * math.sin((t()) * f * Bf))))
 
     image = []
     for x in range(8):

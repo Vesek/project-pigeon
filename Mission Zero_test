@@ -8,9 +8,8 @@ coefrequency = 1
 def t():
     return((time.time() - times)*speed)
 
-for o in range(40):
+while t() < 29:
     c = (255, 255, 255)
-    k = (1, 1, 1)
     #0.7-0.1
     amplitude = sum(c)/765*coeamplitude
     def pixel(row, column):
@@ -23,7 +22,7 @@ for o in range(40):
         f = 0.001 * coefrequency
         a = 0.007 * coeamplitude
         if abs((a * (Ra * math.sin((t() + column) * f * Rf) + Ga * math.sin((t() + column) * f * Gf) + Ba * math.sin((t() + column) * f * Bf))) + 3.5 - row) <= 0.5:
-            return (k)
+            return (c)
         return (0, 0, 0)
 
     Ra = c[0]
