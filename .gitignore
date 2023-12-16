@@ -2,3 +2,4 @@ __pycache__/
 *.jpg
 test_imgs/
 result.txt
+*.sqlite
