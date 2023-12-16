@@ -80,11 +80,7 @@ def calculate_mean_distance(coordinates_1, coordinates_2):
         if isinstance(median_value, np.ndarray) and len(median_value) == 2:
             median_value = np.median(median_value)
         
-        first_mode = stats.mode(all_distances)
-        modes = first_mode.mode
-        mode_value = np.median(modes)
-        
-    return (median_value + mode_value)/2
+    return median_value
 
 def calculate_speed_in_kmps(feature_distance, GSD, time_difference):
     distance = feature_distance * GSD / 100000
@@ -124,6 +120,6 @@ if __name__ == "__main__":
     coordinates_1, coordinates_2 = find_matching_coordinates(keypoints[0][0], keypoints[1][0], good_matches)
     average_feature_distance = calculate_mean_distance(coordinates_1, coordinates_2)
     
-    speed = calculate_speed_in_kmps(average_feature_distance, 12648, time_difference)
+    speed = calculate_speed_in_kmps(average_feature_distance, 13700, time_difference)
     print("The speed of ISS is ", speed, "(km/s)")
     cv.waitKey(0)
