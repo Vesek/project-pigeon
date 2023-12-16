@@ -1,137 +1,87 @@
+from time import sleep, time
+import cv2 as cv
+import numpy as np
+from scipy import stats
+import math
+
+def detect_keypoints(obj, scene):
+    images = [obj, scene]
+    '''
+    Detect the keypoints using SURF Detector, compute the descriptors
+    '''
+    keypoints = []
+    detector = cv.SIFT_create()
+    for image in images:
+        keypoints.append(detector.detectAndCompute(image, None)) # Returns keypoints and descriptors
+
+    '''
+    Matching descriptor vectors with a FLANN based matcher
+    Since SURF is a floating-pdoint descriptor NORM_L2 is used
+    '''
+    matcher = cv.DescriptorMatcher_create(cv.DescriptorMatcher_FLANNBASED) 
+    knn_matches = matcher.knnMatch(keypoints[0][1], keypoints[1][1], 2)
+
+    # Filter matches using the Lowe's ratio test
+    ratio_thresh = 0.75
+    good_matches = []
+    for m,n in knn_matches:
+        if m.distance < ratio_thresh * n.distance:
+            good_matches.append(m)
+    return good_matches, keypoints
+            
+def draw(obj, scene, good_matches, keypoints):
+    '''
+    Draw matches
+    '''
+    img_matches = np.empty((max(obj.shape[0], scene.shape[0]), obj.shape[1]+scene.shape[1], 3), dtype=np.uint8)
+    cv.drawMatches(obj, keypoints[0][0], scene, keypoints[1][0], good_matches, img_matches, flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
+    
+    return img_matches
+    
+def localize(good_matches, keypoints):
+    '''
+    Localize the object
+    '''
+    obj = np.empty((len(good_matches),2), dtype=np.float32)
+    scene = np.empty((len(good_matches),2), dtype=np.float32)
+    
+    for i in range(len(good_matches)):
+        #Get the keypoints from the good matches
+        obj[i,0] = keypoints[0][0][good_matches[i].queryIdx].pt[0]
+        obj[i,1] = keypoints[0][0][good_matches[i].queryIdx].pt[1]
+        scene[i,0] = keypoints[1][0][good_matches[i].trainIdx].pt[0]
+        scene[i,1] = keypoints[1][0][good_matches[i].trainIdx].pt[1]
+        
+    H, _ =  cv.findHomography(obj, scene, cv.RANSAC)
+    
+    return H
+        
+
 if __name__ == "__main__":
     from picamera import PiCamera
-    from time import sleep
-    import cv2 as cv
-    import numpy as np
-    from scipy import stats
-    import math
     
-#test:
-    time_difference = 7
-
-
-    cam = PiCamera()
-
-    
-
+    #test:
+    cam = PiCamera()    
     cam.resolution = (500, 500)
-
+    timestamp1 = time()
+    print("timestamp1 is: ", timestamp1)
     cam.capture("image1.jpg")
-    
     cam.capture("image2.jpg")
-
+    time_difference = time() - timestamp1
+    print("timedifference is: ", time_difference)
+    #time_difference = 7
     img_object = cv.imread("image1.jpg")
-
     img_scene = cv.imread("image2.jpg")
-
-    
-
-    
-
     if img_object is None or img_scene is None:
-
         print('Could not open or find the images!')
-
         exit(0)
-
-    #-- Step 1: Detect the keypoints using SURF Detector, compute the descriptors
-
-   
-
-    detector = cv.SIFT_create()
-
-    keypoints_obj, descriptors_obj = detector.detectAndCompute(img_object, None)
-
-    keypoints_scene, descriptors_scene = detector.detectAndCompute(img_scene, None)
-
-    #-- Step 2: Matching descriptor vectors with a FLANN based matcher
-
-    # Since SURF is a floating-pdoint descriptor NORM_L2 is used
-
-    matcher = cv.DescriptorMatcher_create(cv.DescriptorMatcher_FLANNBASED)
-
-    knn_matches = matcher.knnMatch(descriptors_obj, descriptors_scene, 2)
-
-    #-- Filter matches using the Lowe's ratio test
-
-    ratio_thresh = 0.75
-
-    good_matches = []
-
-    for m,n in knn_matches:
-
-        if m.distance < ratio_thresh * n.distance:
-
-            good_matches.append(m)
-
-    #-- Draw matches
-
-    img_matches = np.empty((max(img_object.shape[0], img_scene.shape[0]), img_object.shape[1]+img_scene.shape[1], 3), dtype=np.uint8)
-
-    cv.drawMatches(img_object, keypoints_obj, img_scene, keypoints_scene, good_matches, img_matches, flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS)
-
-    #-- Localize the object
-
-    obj = np.empty((len(good_matches),2), dtype=np.float32)
-
-    scene = np.empty((len(good_matches),2), dtype=np.float32)
-
-    for i in range(len(good_matches)):
-
-        #-- Get the keypoints from the good matches
-
-        obj[i,0] = keypoints_obj[good_matches[i].queryIdx].pt[0]
-
-        obj[i,1] = keypoints_obj[good_matches[i].queryIdx].pt[1]
-
-        scene[i,0] = keypoints_scene[good_matches[i].trainIdx].pt[0]
-
-        scene[i,1] = keypoints_scene[good_matches[i].trainIdx].pt[1]
-
-    H, _ =  cv.findHomography(obj, scene, cv.RANSAC)
-
-    #-- Get the corners from the image_1 ( the object to be "detected" )
-
-    obj_corners = np.empty((4,1,2), dtype=np.float32)
-
-    obj_corners[0,0,0] = 0
-
-    obj_corners[0,0,1] = 0
-
-    obj_corners[1,0,0] = img_object.shape[1]
-
-    obj_corners[1,0,1] = 0
-
-    obj_corners[2,0,0] = img_object.shape[1]
-
-    obj_corners[2,0,1] = img_object.shape[0]
-
-    obj_corners[3,0,0] = 0
-
-    obj_corners[3,0,1] = img_object.shape[0]
-
-    scene_corners = cv.perspectiveTransform(obj_corners, H)
-
-    #-- Draw lines between the corners (the mapped object in the scene - image_2 )
-
-    cv.line(img_matches, (int(scene_corners[0,0,0] + img_object.shape[1]), int(scene_corners[0,0,1])),\
-
-        (int(scene_corners[1,0,0] + img_object.shape[1]), int(scene_corners[1,0,1])), (0,255,0), 4)
-
-    cv.line(img_matches, (int(scene_corners[1,0,0] + img_object.shape[1]), int(scene_corners[1,0,1])),\
-
-        (int(scene_corners[2,0,0] + img_object.shape[1]), int(scene_corners[2,0,1])), (0,255,0), 4)
-
-    cv.line(img_matches, (int(scene_corners[2,0,0] + img_object.shape[1]), int(scene_corners[2,0,1])),\
-
-        (int(scene_corners[3,0,0] + img_object.shape[1]), int(scene_corners[3,0,1])), (0,255,0), 4)
-
-    cv.line(img_matches, (int(scene_corners[3,0,0] + img_object.shape[1]), int(scene_corners[3,0,1])),\
-
-        (int(scene_corners[0,0,0] + img_object.shape[1]), int(scene_corners[0,0,1])), (0,255,0), 4)
-
+    
+    good_matches, keypoints = detect_keypoints(img_object, img_scene)
+    h = localize(good_matches, keypoints)
+    img = draw(img_object, img_scene, good_matches, keypoints)
+    
     #-- Show detected matches
-    resized_picture = cv.resize(img_matches, (1280, 720))    
+    resized_picture = cv.resize(img, (1280, 720))    
     
     def find_matching_coordinates(keypoints_1, keypoints_2, matches):
         coordinates_1 = []
@@ -166,9 +116,8 @@ if __name__ == "__main__":
             
         return (median_value + mode_value)/2
         
-    coordinates_1, coordinates_2 = find_matching_coordinates(keypoints_obj, keypoints_scene, good_matches)
+    coordinates_1, coordinates_2 = find_matching_coordinates(keypoints[0][0], keypoints[1][0], good_matches)
     average_feature_distance = calculate_mean_distance(coordinates_1, coordinates_2)
-    
     
     def calculate_speed_in_kmps(feature_distance, GSD, time_difference):
         distance = feature_distance * GSD / 100000
@@ -176,6 +125,5 @@ if __name__ == "__main__":
         return speed
     
     speed = calculate_speed_in_kmps(average_feature_distance, 12648, time_difference)
-    print("The speed of an ISS is ", speed, "(km/s)")
-    #cv.imshow('Good Matches & Object detection', resized_picture)
+    print("The speed of ISS is ", speed, "(km/s)")
     cv.waitKey(0)
