@@ -20,7 +20,8 @@ for o in range(100):
     rgb = sense.color 
     c = (rgb.red, rgb.green, rgb.blue)
     k = (1, 1, 1)
-    frequency = 0.3
+    frequency = ((((c[0])*256+c[1])*256+c[2])/(2**24))*0.6+0.1
+    #0.7-0.1
     amplitude = sum(c)/765*coeamplitude
     def pixel(row, column):
         if abs(math.cos((t() + column)*frequency)* 4 * amplitude + 3.5 - row) <= 0.5:
