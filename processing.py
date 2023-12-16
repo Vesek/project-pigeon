@@ -52,10 +52,44 @@ def localize(good_matches, keypoints):
         scene[i,0] = keypoints[1][0][good_matches[i].trainIdx].pt[0]
         scene[i,1] = keypoints[1][0][good_matches[i].trainIdx].pt[1]
         
-    H, _ =  cv.findHomography(obj, scene, cv.RANSAC)
-    
-    return H
+        H, _ =  cv.findHomography(obj, scene, cv.RANSAC)
+
+        return H
+
+def find_matching_coordinates(keypoints_1, keypoints_2, matches):
+    coordinates_1 = []
+    coordinates_2 = []
+    for match in matches:
+        image_object_idx = match.queryIdx
+        image_scene_idx = match.trainIdx
+        (x1,y1) = keypoints_1[image_object_idx].pt
+        (x2,y2) = keypoints_2[image_scene_idx].pt
+        coordinates_1.append((x1,y1))
+        coordinates_2.append((x2,y2))
+    return coordinates_1, coordinates_2
+
+def calculate_mean_distance(coordinates_1, coordinates_2):
+    all_distances = []
+    merged_coordinates = list(zip(coordinates_1, coordinates_2))
+    for coordinate in merged_coordinates:
+        x_difference = coordinate[0][0] - coordinate[1][0]
+        y_difference = coordinate[0][1] - coordinate[1][1]
+        distance = math.hypot(x_difference, y_difference)
+        all_distances.append(distance)
+        median_value = np.median(all_distances)
+        if isinstance(median_value, np.ndarray) and len(median_value) == 2:
+            median_value = np.median(median_value)
         
+        first_mode = stats.mode(all_distances)
+        modes = first_mode.mode
+        mode_value = np.median(modes)
+        
+    return (median_value + mode_value)/2
+
+def calculate_speed_in_kmps(feature_distance, GSD, time_difference):
+    distance = feature_distance * GSD / 100000
+    speed = distance / time_difference
+    return speed
 
 if __name__ == "__main__":
     from picamera import PiCamera
@@ -82,47 +116,9 @@ if __name__ == "__main__":
     
     #-- Show detected matches
     resized_picture = cv.resize(img, (1280, 720))    
-    
-    def find_matching_coordinates(keypoints_1, keypoints_2, matches):
-        coordinates_1 = []
-        coordinates_2 = []
-        for match in matches:
-            image_object_idx = match.queryIdx
-            image_scene_idx = match.trainIdx
-            (x1,y1) = keypoints_1[image_object_idx].pt
-            (x2,y2) = keypoints_2[image_scene_idx].pt
-            coordinates_1.append((x1,y1))
-            coordinates_2.append((x2,y2))
-        return coordinates_1, coordinates_2
-    
-    
-    def calculate_mean_distance(coordinates_1, coordinates_2):
-        all_distances = []
-        merged_coordinates = list(zip(coordinates_1, coordinates_2))
-        for coordinate in merged_coordinates:
-            x_difference = coordinate[0][0] - coordinate[1][0]
-            y_difference = coordinate[0][1] - coordinate[1][1]
-            distance = math.hypot(x_difference, y_difference)
-            all_distances.append(distance)
-            median_value = np.median(all_distances)
-            if isinstance(median_value, np.ndarray) and len(median_value) == 2:
-                median_value = np.median(median_value)
-            
-            first_mode = stats.mode(all_distances)
-            modes = first_mode.mode
-            mode_value = np.median(modes)
-            
-            
-            
-        return (median_value + mode_value)/2
         
     coordinates_1, coordinates_2 = find_matching_coordinates(keypoints[0][0], keypoints[1][0], good_matches)
     average_feature_distance = calculate_mean_distance(coordinates_1, coordinates_2)
-    
-    def calculate_speed_in_kmps(feature_distance, GSD, time_difference):
-        distance = feature_distance * GSD / 100000
-        speed = distance / time_difference
-        return speed
     
     speed = calculate_speed_in_kmps(average_feature_distance, 12648, time_difference)
     print("The speed of ISS is ", speed, "(km/s)")
