@@ -7,6 +7,7 @@ import collections
 import processing
 import os.path
 import glob
+from statistics import mean
 
 class PigeonISS():
     def __init__(self, iss):
@@ -55,9 +56,10 @@ class PigeonISS():
         return (time_b - time_a).seconds
     
 if __name__ == "__main__":
+    parent_dir = os.path.dirname(__file__)
     test_camera = True    
     if test_camera:
-        dir_path = os.path.join(os.path.dirname(__file__),"test_imgs")
+        dir_path = os.path.join(parent_dir,"test_imgs")
         file_paths = sorted(filter(os.path.isfile,glob.glob(os.path.join(dir_path, '*'))))
         print(dir_path, file_paths)
         if len(file_paths) < 2:
@@ -71,18 +73,32 @@ if __name__ == "__main__":
         pigeon = PigeonISS(ISS())
     start_time = datetime.now()
     if not test_camera: pigeon.capture(cam)
-    while (datetime.now() < start_time + timedelta(minutes=1)):
+    speed_list = []
+    while (datetime.now() < start_time + timedelta(minutes=4)):
         if test_camera:
+            if pigeon.img_counter+1 == len(file_paths):
+                print("out of images")
+                break
             totaltime = pigeon.test_capture(file_paths[pigeon.img_counter], file_paths[pigeon.img_counter+1])
             pigeon.img_counter += 1
         if not test_camera: pigeon.capture(cam)
-        print(len(pigeon.d))
         if not test_camera: totaltime = (pigeon.d[1][1] - pigeon.d[0][1]).seconds
-        print(totaltime)
+        print("Time difference:", totaltime)
         good_matches, keypoints = processing.detect_keypoints(pigeon.d[1][0], pigeon.d[0][0])
         # h = processing.localize(good_matches, keypoints)
         coordinates_1, coordinates_2 = processing.find_matching_coordinates(keypoints[0][0], keypoints[1][0], good_matches)
         average_feature_distance = processing.calculate_mean_distance(coordinates_1, coordinates_2)
         
         speed = processing.calculate_speed_in_kmps(average_feature_distance, 13700, totaltime)
-        print(speed)
+        speed_list.append(speed)
+        print(mean(speed_list))
+    print(f"ISS is travelling at: {mean(speed_list)}km/s")
+    # Format the estimate_kmps to have a precision of 5 significant figures
+    estimate_kmps_formatted = "{:.5f}".format(mean(speed_list))
+
+    # Write to the file
+    result_file = os.path.join(parent_dir,"result.txt") # Replace with your desired file path
+    with open(result_file, 'w') as file:
+        file.write(estimate_kmps_formatted)
+
+    print("Data written to", result_file)
