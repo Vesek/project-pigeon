@@ -84,6 +84,5 @@ if __name__ == "__main__":
         coordinates_1, coordinates_2 = processing.find_matching_coordinates(keypoints[0][0], keypoints[1][0], good_matches)
         average_feature_distance = processing.calculate_mean_distance(coordinates_1, coordinates_2)
         
-        speed = processing.calculate_speed_in_kmps(average_feature_distance, 13666, totaltime)
+        speed = processing.calculate_speed_in_kmps(average_feature_distance, 13700, totaltime)
         print(speed)
-        time.sleep(1)
