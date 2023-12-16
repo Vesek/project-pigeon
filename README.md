@@ -4,7 +4,7 @@ The task is to calculate the speed of the ISS using pictures taken from a RPi HQ
 
 ## Mission Zero
 Our twist on mission zero is a sinewave modulated by the intesity of the RGB components ilustrating a real EM wave.
-Made by Franta Slepička - @FrteenCZ
+Made by [Franta Slepička](https://github.com/FrteenCZ)
 
 ## Mission Space Lab
 In mission space lab we used an approach that differentiates itself from the other ones because it doesn't use much of the original code from the instructions.
