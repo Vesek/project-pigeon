@@ -1,6 +1,14 @@
 # project-pigeon
 A project for the AstroPi hackathon in Pardubice
- 
-the task is to calculate the speed of the ISS (probablby) 
+The task is to calculate the speed of the ISS using pictures taken from a RPi HQ camera aboard.
 
-Hello from Franta
+## Mission Zero
+Our twist on mission zero is a sinewave modulated by the intesity of the RGB components ilustrating a real EM wave.
+Made by Franta Slepička - @FrteenCZ
+
+## Mission Space Lab
+In mission space lab we used an approach that differentiates itself from the other ones because it doesn't use much of the original code from the instructions.
+
+We plan to add a TFLite model for the Coral NPU on board the Astro Pi and also try to measure the g-forces caused by the slight acceleration of the station.
+
+During the development we used a lot of internet resources but the most helpful were Python, OpenCV and RPi docs.
