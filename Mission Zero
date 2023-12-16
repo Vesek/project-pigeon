@@ -65,6 +65,4 @@ while t() < 28:
         print(line)
 
 #display output  
-    sense.set_pixels(image)        
-    
-    
+    sense.set_pixels(image)
