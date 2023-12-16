@@ -49,10 +49,12 @@ class PigeonISS():
             time_str = img.get("datetime_original")
             time_b = datetime.strptime(time_str, '%Y:%m:%d %H:%M:%S')
          
-        aaa= cv2.imread(first)
-        be = cv2.imread(second)
-        self.d.append([aaa,0])
-        self.d.append([be,0])
+        a = cv2.imread(first)
+        a = cv2.resize(a,(4056,3040))
+        b = cv2.imread(second)
+        b = cv2.resize(b,(4056,3040))
+        self.d.append([a,0])
+        self.d.append([b,0])
         return (time_b - time_a).seconds
     
 if __name__ == "__main__":
@@ -74,7 +76,7 @@ if __name__ == "__main__":
     start_time = datetime.now()
     if not test_camera: pigeon.capture(cam)
     speed_list = []
-    while (datetime.now() < start_time + timedelta(minutes=4)):
+    while (datetime.now() < start_time + timedelta(minutes=9)):
         if test_camera:
             if pigeon.img_counter+1 == len(file_paths):
                 print("out of images")
@@ -89,7 +91,7 @@ if __name__ == "__main__":
         coordinates_1, coordinates_2 = processing.find_matching_coordinates(keypoints[0][0], keypoints[1][0], good_matches)
         average_feature_distance = processing.calculate_mean_distance(coordinates_1, coordinates_2)
         
-        speed = processing.calculate_speed_in_kmps(average_feature_distance, 13700, totaltime)
+        speed = processing.calculate_speed_in_kmps(average_feature_distance, 14000, totaltime)
         speed_list.append(speed)
         print(mean(speed_list))
     print(f"ISS is travelling at: {mean(speed_list)}km/s")
