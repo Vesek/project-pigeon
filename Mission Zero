@@ -1,56 +1,60 @@
+# Import the libraries
 import math
 import time
 from sense_hat import SenseHat
 
+# Set up the Sense HAT
 sense = SenseHat()
 sense.set_rotation(270)
 
+# Set up the colour sensor
 sense.color.gain = 60 
 sense.color.integration_cycles = 64
 
-times = time.time()
+#define coefficients
 speed = 10
-coeamplitude = 1
-coefrequency = 1
-def t():
-    return((time.time() - times)*speed)
+amplitude = 0.007
+frequency = 0.001
 
-while t() < 29:
+#time tracking
+times = time.time()
+def t():
+    return(time.time() - times)
+
+#time limit
+while t() < 28:
+
+#save color from sensor to matrix
     rgb = sense.color 
     c = (rgb.red, rgb.green, rgb.blue)
-    amplitude = sum(c)/765*coeamplitude
+
+#function deciding pixel state    
     def pixel(row, column):
+
+    #parameters of waves
+        
+        #amplitude
         Ra = c[0]
         Ga = c[1]
         Ba = c[2]
+
+        #frequency
         Rf = 430
         Gf = 565
         Bf = 650
-        f = 0.001 * coefrequency
-        a = 0.007 * coeamplitude
-        if abs((a * (Ra * math.sin((t() + column) * f * Rf) + Ga * math.sin((t() + column) * f * Gf) + Ba * math.sin((t() + column) * f * Bf))) + 3.5 - row) <= 0.5:
-            return (c)
+
+    #if that is calculating height of the graph of 3 added sine waves at regular intervals and then selecin the appropriate pixel at that height
+        if abs((amplitude * (Ra * math.sin((t() * speed + column) * frequency * Rf) + Ga * math.sin((t() * speed + column) * frequency * Gf) + Ba * math.sin((t() * speed + column) * frequency * Bf))) + 3.5 - row) <= 0.5:
+            return (255, 255, 255)
         return (0, 0, 0)
-
-    Ra = c[0]
-    Ga = c[1]
-    Ba = c[2]
-    Rf = 430
-    Gf = 565
-    Bf = 650
-    f = 0.001
-    a = 0.007
-    print((a * (Ra * math.sin((t()) * f * Rf) + Ga * math.sin((t()) * f * Gf) + Ba * math.sin((t()) * f * Bf))))
-
+    
+#make a matrix of matrices
     image = []
     for x in range(8):
         for y in range(8):
             image.append(pixel(x,y))
-    #        print(x*10+y, image[-1])
-    # print(image)
-    # for i in range(8):
-    #     print(image[i*8 : 7+i*8])
-    # print(t())
+  
+#terminal output
     for x in range(8):
         line = ""
         for y in range(8):
@@ -59,7 +63,8 @@ while t() < 29:
             else:
                 line += "□  "
         print(line)
+
+#display output  
     sense.set_pixels(image)        
-    #■
-    #□
-    time.sleep(0.1)
+    
+    

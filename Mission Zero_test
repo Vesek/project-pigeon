@@ -6,9 +6,9 @@ speed = 10
 coeamplitude = 1
 coefrequency = 1
 def t():
-    return((time.time() - times)*speed)
+    return(time.time() - times)
 
-while t() < 29:
+while t() < 28:
     c = (255, 255, 255)
     #0.7-0.1
     amplitude = sum(c)/765*coeamplitude
@@ -21,19 +21,9 @@ while t() < 29:
         Bf = 650
         f = 0.001 * coefrequency
         a = 0.007 * coeamplitude
-        if abs((a * (Ra * math.sin((t() + column) * f * Rf) + Ga * math.sin((t() + column) * f * Gf) + Ba * math.sin((t() + column) * f * Bf))) + 3.5 - row) <= 0.5:
+        if abs((a * (Ra * math.sin((t() * speed + column) * f * Rf) + Ga * math.sin((t() * speed + column) * f * Gf) + Ba * math.sin((t() * speed + column) * f * Bf))) + 3.5 - row) <= 0.5:
             return (c)
         return (0, 0, 0)
-
-    Ra = c[0]
-    Ga = c[1]
-    Ba = c[2]
-    Rf = 430
-    Gf = 565
-    Bf = 650
-    f = 0.001
-    a = 0.007
-    print((a * (Ra * math.sin((t()) * f * Rf) + Ga * math.sin((t()) * f * Gf) + Ba * math.sin((t()) * f * Bf))))
 
     image = []
     for x in range(8):
