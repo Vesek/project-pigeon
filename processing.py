@@ -93,10 +93,11 @@ def calculate_speed_in_kmps(feature_distance, GSD, time_difference):
 
 if __name__ == "__main__":
     from picamera import PiCamera
+
     
     #test:
     cam = PiCamera()    
-    cam.resolution = (500, 500)
+    cam.resolution = (4056, 3040)
     timestamp1 = time()
     print("timestamp1 is: ", timestamp1)
     cam.capture("image1.jpg")
@@ -104,6 +105,7 @@ if __name__ == "__main__":
     time_difference = time() - timestamp1
     print("timedifference is: ", time_difference)
     #time_difference = 7
+
     img_object = cv.imread("image1.jpg")
     img_scene = cv.imread("image2.jpg")
     if img_object is None or img_scene is None:
@@ -115,7 +117,9 @@ if __name__ == "__main__":
     img = draw(img_object, img_scene, good_matches, keypoints)
     
     #-- Show detected matches
+
     resized_picture = cv.resize(img, (1280, 720))    
+
         
     coordinates_1, coordinates_2 = find_matching_coordinates(keypoints[0][0], keypoints[1][0], good_matches)
     average_feature_distance = calculate_mean_distance(coordinates_1, coordinates_2)
