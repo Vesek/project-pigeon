@@ -74,7 +74,7 @@ class PigeonISS():
 if __name__ == "__main__":
     # Set the parent directory
     parent_dir = os.path.dirname(__file__)
-    test_camera = True
+    test_camera = False
 
     # Check if testing with pre-captured images
     if test_camera:
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     print(f"ISS is travelling at: {mean(speed_list)} km/s")
 
     # Format the estimate_kmps to have a precision of 5 significant figures
-    estimate_kmps_formatted = "{:.5f}".format(mean(speed_list))
+    estimate_kmps_formatted = "{:.4f}".format(mean(speed_list))
 
     # Write the resulting speed to a file
     result_file = os.path.join(parent_dir, "result.txt")
