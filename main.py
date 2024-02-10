@@ -122,9 +122,6 @@ if __name__ == "__main__":
         # Capture an image if not testing with pre-captured images
         if not test_camera:
             pigeon.capture(cam)
-        
-        # Save the time the frame started to be processed
-        frame_time = datetime.now()
 
         # Calculate the time difference if not testing
         if not test_camera:
@@ -138,10 +135,6 @@ if __name__ == "__main__":
         speed = processing.calculate_speed_in_kmps(average_feature_distance, 14000, totaltime)
         speed_list.append(speed)
         print(mean(speed_list))
-        
-        while (datetime.now() < frame_time + timedelta(seconds=13)):
-            pass
-        print("13 seconds passed")
     
     # Close the camera
     cam.close()
