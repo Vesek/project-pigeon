@@ -9,6 +9,9 @@ import os.path
 import glob
 from statistics import mean
 
+# Get the parent directory
+parent_dir = os.path.dirname(__file__)
+
 class PigeonISS():
     def __init__(self, iss):
         self.iss = iss
@@ -42,7 +45,7 @@ class PigeonISS():
         exif_jpg.datetime_original = timestamp.strftime("%a %d %b %Y, %H:%M:%S:%f")
         
         # Save the image with updated metadata
-        with open(f'image{self.img_counter}.jpg', 'wb') as new_file:
+        with open(os.path.join(parent_dir,f'image{self.img_counter}.jpg'), 'wb') as new_file:
             new_file.write(exif_jpg.get_file())
         self.img_counter += 1
 
@@ -72,8 +75,6 @@ class PigeonISS():
 
 # Main execution block
 if __name__ == "__main__":
-    # Set the parent directory
-    parent_dir = os.path.dirname(__file__)
     test_camera = False
 
     # Check if testing with pre-captured images
@@ -107,6 +108,7 @@ if __name__ == "__main__":
 
     # Run the loop for 9 minutes
     while (datetime.now() < start_time + timedelta(minutes=9)):
+        
         if test_camera:
             # Break if all images have been processed
             if pigeon.img_counter + 1 == len(file_paths):
@@ -120,6 +122,9 @@ if __name__ == "__main__":
         # Capture an image if not testing with pre-captured images
         if not test_camera:
             pigeon.capture(cam)
+        
+        # Save the time the frame started to be processed
+        frame_time = datetime.now()
 
         # Calculate the time difference if not testing
         if not test_camera:
@@ -133,6 +138,13 @@ if __name__ == "__main__":
         speed = processing.calculate_speed_in_kmps(average_feature_distance, 14000, totaltime)
         speed_list.append(speed)
         print(mean(speed_list))
+        
+        while (datetime.now() < frame_time + timedelta(seconds=13)):
+            pass
+        print("13 seconds passed")
+    
+    # Close the camera
+    cam.close()
 
     # Print the average speed
     print(f"ISS is travelling at: {mean(speed_list)} km/s")
