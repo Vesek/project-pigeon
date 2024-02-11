@@ -6,7 +6,6 @@ import exif
 import collections
 import processing
 import os.path
-import glob
 from statistics import mean
 
 # Get the parent directory
