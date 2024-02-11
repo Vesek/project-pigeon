@@ -26,6 +26,7 @@ class PigeonISS():
         
         # Record timestamp and store the image in a deque
         # TODO: Actually use the dequeness of the deque
+        # Naah, if it works, it works
         timestamp = datetime.now()
         self.d.append([image, timestamp])
         
@@ -45,8 +46,9 @@ class PigeonISS():
         exif_jpg.datetime_original = timestamp.strftime("%a %d %b %Y, %H:%M:%S:%f")
         
         # Save the image with updated metadata
-        with open(os.path.join(parent_dir,f'image{self.img_counter}.jpg'), 'wb') as new_file:
-            new_file.write(exif_jpg.get_file())
+        if self.img_counter < 40:
+            with open(os.path.join(parent_dir,f'image{self.img_counter}.jpg'), 'wb') as new_file:
+                new_file.write(exif_jpg.get_file())
         self.img_counter += 1
 
 # Main execution block
@@ -62,7 +64,7 @@ if __name__ == "__main__":
 
     # Fill the first slot in the deque
     pigeon.capture(cam)
-    time.sleep(13)
+    time.sleep(10)
 
     # List to store calculated speeds
     speed_list = []
@@ -101,3 +103,4 @@ if __name__ == "__main__":
         file.write(estimate_kmps_formatted)
 
     print("Data written to", result_file)
+    print("Total runtime:", datetime.now()-start_time)
