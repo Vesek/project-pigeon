@@ -1,3 +1,7 @@
+'''
+Much of the here used code comes from the OpenCV and Rapberry Pi Foundation documentation and we give them a big thanks for that.
+'''
+
 import cv2
 import numpy as np
 from datetime import datetime, timedelta
@@ -30,6 +34,7 @@ class PigeonISS():
         self.d.append([image, timestamp])
         
         # Extract ISS coordinates and create image metadata
+        # This code wouldn't be possible witohut the Python EXIF module documentation
         self.coords = self.iss.coordinates()
         status, image_jpg_coded = cv2.imencode('.jpg', image)
         image_jpg_coded_bytes = image_jpg_coded.tobytes()
