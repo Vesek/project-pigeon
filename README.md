@@ -12,3 +12,7 @@ In mission space lab we used an approach that differentiates itself from the oth
 We plan to add a TFLite model for the Coral NPU on board the Astro Pi and also try to measure the g-forces caused by the slight acceleration of the station.
 
 During the development we used a lot of internet resources but the most helpful were Python, OpenCV and RPi docs.
+
+## Usage
+To make a flight ready `.zip` file, remove the _iss from desired files and compress them.
+Those files have some of the debugging stripped from them, so they only run in the simulator.
