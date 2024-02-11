@@ -11,9 +11,13 @@ import collections
 import processing
 import os.path
 from statistics import mean
+import logging
 
 # Get the parent directory
 parent_dir = os.path.dirname(__file__)
+
+# Setup the log file
+logging.basicConfig(filename=os.path.join(parent_dir,"pigeon.log"), encoding='utf-8', level=logging.INFO)
 
 class PigeonISS():
     def __init__(self, iss):
@@ -80,7 +84,6 @@ if __name__ == "__main__":
 
         # Calculate the time difference
         totaltime = (pigeon.d[1][1] - pigeon.d[0][1]).seconds
-        print("Time difference:", totaltime)
 
         # Perform image processing to detect keypoints and calculate speed
         good_matches, keypoints = processing.detect_keypoints(pigeon.d[1][0], pigeon.d[0][0])
@@ -88,15 +91,15 @@ if __name__ == "__main__":
         average_feature_distance = processing.calculate_mean_distance(coordinates_1, coordinates_2)
         speed = processing.calculate_speed_in_kmps(average_feature_distance, 14000, totaltime)
         speed_list.append(speed)
-        print(mean(speed_list))
+        logging.info(f"Current speed:{str(mean(speed_list))}")
         
         time.sleep(10)
     
     # Close the camera
     cam.close()
 
-    # Print the average speed
-    print(f"ISS is travelling at: {mean(speed_list)} km/s")
+    # Log the average speed
+    logging.info(f"ISS is travelling at: {mean(speed_list)} km/s")
 
     # Format the estimate_kmps to have a precision of 5 significant figures
     estimate_kmps_formatted = "{:.4f}".format(mean(speed_list))
@@ -106,5 +109,5 @@ if __name__ == "__main__":
     with open(result_file, 'w') as file:
         file.write(estimate_kmps_formatted)
 
-    print("Data written to", result_file)
-    print("Total runtime:", datetime.now()-start_time)
+    logging.info(f"Data written to {result_file}")
+    logging.info(f"Total runtime: {str(datetime.now()-start_time)}")
