@@ -17,7 +17,7 @@ import logging
 parent_dir = os.path.dirname(__file__)
 
 # Setup the log file
-logging.basicConfig(filename=os.path.join(parent_dir,"pigeon.log"), encoding='utf-8', level=logging.INFO)
+logging.basicConfig(format='%(levelname)s:%(message)s', filename=os.path.join(parent_dir,"pigeon.log"), encoding='utf-8', level=logging.INFO)
 
 class PigeonISS():
     def __init__(self, iss):
@@ -91,7 +91,7 @@ if __name__ == "__main__":
         average_feature_distance = processing.calculate_mean_distance(coordinates_1, coordinates_2)
         speed = processing.calculate_speed_in_kmps(average_feature_distance, 14000, totaltime)
         speed_list.append(speed)
-        logging.info(f"Current speed:{str(mean(speed_list))}")
+        logging.info(f"Current speed: {str(mean(speed_list))}, Elapsed time: {str(datetime.now()-start_time)}")
         
         time.sleep(10)
     
